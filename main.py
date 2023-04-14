@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
@@ -70,9 +70,16 @@ def register():
     return render_template('register.html', title='Регистрация', form=form)
 
 
-@app.route('/', methods=["GET"])
+@app.route('/', methods=["GET", "POST"])
 def main_screen():
-    return render_template("main.html", title="Главный экран")
+    if request.method == "GET":
+        return render_template("main.html", title="Главный экран")
+    elif request.method == "POST":
+        task = int(request.form["task"])
+        if not task:
+            return render_template("main.html", title="Главный экран", message="Выберите категорию задания")
+        print(task)
+        return f"Задание {task}"
 
 
 def main():

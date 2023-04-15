@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
@@ -6,7 +6,9 @@ from data.tasks import *
 from forms.register import RegisterForm
 from forms.login import LoginForm
 import os
+import random
 
+CLASS_DICT = {9: Task9, 12: Task12, 10: Task10, 13: Task13, 15: Task15, 16: Task16}
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
@@ -70,9 +72,42 @@ def register():
     return render_template('register.html', title='Регистрация', form=form)
 
 
-@app.route('/', methods=["GET"])
+@app.route('/', methods=["GET", "POST"])
 def main_screen():
-    return render_template("main.html", title="Главный экран")
+    if request.method == "GET":
+        return render_template("main.html", title="Главный экран")
+    elif request.method == "POST":
+        category_of_task = int(request.form["task"])
+        if not category_of_task:
+            return render_template("main.html", title="Главный экран", message="Выберите категорию задания")
+        print(category_of_task)
+        sess = db_session.create_session()
+        task_number = len(sess.query(CLASS_DICT[category_of_task]).all())
+        while True:
+            random_task = sess.query(CLASS_DICT[category_of_task]).filter(CLASS_DICT[category_of_task].id == random.randint(1, task_number)).first()
+            if not (str(current_user.id) in random_task.done_by):
+                break
+        return redirect(f"/category_task/{category_of_task}/task/{random_task.id}")
+
+
+@app.route("/category_task/<int:category>/task/<int:id_task>", methods=["GET", "POST"])
+@login_required
+def show_task(category, id_task):
+    sess = db_session.create_session()
+    task = sess.query(CLASS_DICT[category]).get(id_task)
+    # print(task.text_of_the_task)
+    if request.method == "GET":
+        return render_template("task.html", title=f"Задание {category}.{id_task}", task=task, category=category)
+    elif request.method == "POST":
+        if "answer" in request.form:
+            ans = set(request.form["answer"].replace(" ", ""))
+            if not (ans == set(task.answers)):
+                return render_template("task.html", title=f"Задание {category}.{id_task}",
+                                       task=task, category=category, message="Вы ошиблись :(", is_right=-1)
+            return render_template("task.html", title=f"Задание {category}.{id_task}",
+                                   task=task, category=category, message="Вы ответили верно!", is_right=1)
+        return render_template("task.html", title=f"Задание {category}.{id_task}",
+                               task=task, category=category, message="Вы ошиблись :(", is_right=-1, is_hint=True)
 
 
 def main():

@@ -1,5 +1,15 @@
 {% extends "base.html" %}
 
+{% block css %}
+<link rel="stylesheet" href="./static/css/custom_selection_field.css">
+<link rel="stylesheet" href="./static/css/drop-down_list.css" type="text/css">
+{% endblock %}
+
+{% block script %}
+<script language="JavaScript" src="./static/javascript/custom_selection_field.js"></script>
+<script language="JavaScript" src="./static/javascript/drop-down_list.js"></script>
+{% endblock %}
+
 {% block content %}
 <h1 align="center">Подготовка к ЕГЭ по русскому языку</h1>
 <p align="center">
@@ -7,7 +17,21 @@
         <a class="btn btn-primary" href="/register">Зарегистрироваться</a>
         <a class="btn btn-success" href="/login">Войти</a>
     {% else %}
-    <a> Добро пожаловать! </a>
+    <form method="post">
+        <div class="custom-select" style="width:400px;position:center;">
+          <select name="task" id="task">
+            <option value="0">Выберите задание:</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Найти</button>
+    </form>
     {% endif %}
+    {{ message }}
 </p>
 {% endblock %}

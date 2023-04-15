@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="../../../../static/css/drop-down_list.css" type="text/css">
+{% if is_right == 1 %}
+    <style>body {background-color: rgb(133, 205, 140);}</style>
+{% elif is_right == -1 %}
+    <style>body {background-color: rgb(224, 105, 105);}</style>
+{% endif %}
+{% endblock %}
+
+{% block script %}
+<script language="JavaScript" src="../../../../static/javascript/drop-down_list.js"></script>
+{% endblock %}
+
+{% block content %}
+<h1 align="center">Задание {{ category }}.{{ task.id }}</h1>
+<p align="center">{{ task.text_of_the_task }}</p>
+<form method="post" id="one">
+    <p align="center">
+    <input type="text" class="form-control" id="answer" placeholder="Введите ответ:" name="answer">
+        {% if is_right == 1 %}
+        <button disabled type="submit" class="btn btn-primary">Отправить ответ</button>
+        {% else %}
+        <button type="submit" class="btn btn-primary">Отправить ответ</button>
+        {% endif %}
+
+    </p>
+</form>
+<p align="center">{{ message }}</p>
+{% if is_right == -1 and not is_hint %}
+<form method="post" id="two">
+    <p align="center">
+    <button type="submit" class="btn btn-primary">Показать подсказку</button>
+    </p>
+</form>
+{% elif is_hint %}
+<p align="center">{{ task.adding }}</p>
+{% endif %}
+{% endblock %}

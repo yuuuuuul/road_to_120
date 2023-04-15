@@ -9,7 +9,7 @@ class Task10(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     text_of_the_task = sqlalchemy.Column(sqlalchemy.String)
-    answer = sqlalchemy.Column(sqlalchemy.String)
+    answers = sqlalchemy.Column(sqlalchemy.String)
     done_by = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     adding = sqlalchemy.Column(sqlalchemy.String)
 
@@ -19,7 +19,7 @@ class Task12(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     text_of_the_task = sqlalchemy.Column(sqlalchemy.String)
-    answer = sqlalchemy.Column(sqlalchemy.String)
+    answers = sqlalchemy.Column(sqlalchemy.String)
     done_by = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     adding = sqlalchemy.Column(sqlalchemy.String)
 
@@ -29,7 +29,7 @@ class Task13(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     text_of_the_task = sqlalchemy.Column(sqlalchemy.String)
-    answer = sqlalchemy.Column(sqlalchemy.String)
+    answers = sqlalchemy.Column(sqlalchemy.String)
     done_by = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     adding = sqlalchemy.Column(sqlalchemy.String)
 
@@ -39,7 +39,7 @@ class Task15(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     text_of_the_task = sqlalchemy.Column(sqlalchemy.String)
-    answer = sqlalchemy.Column(sqlalchemy.String)
+    answers = sqlalchemy.Column(sqlalchemy.String)
     done_by = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     adding = sqlalchemy.Column(sqlalchemy.String)
 
@@ -49,7 +49,7 @@ class Task16(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     text_of_the_task = sqlalchemy.Column(sqlalchemy.String)
-    answer = sqlalchemy.Column(sqlalchemy.String)
+    answers = sqlalchemy.Column(sqlalchemy.String)
     done_by = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     adding = sqlalchemy.Column(sqlalchemy.String)
 
@@ -59,6 +59,6 @@ class Task9(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     text_of_the_task = sqlalchemy.Column(sqlalchemy.String)
-    answer = sqlalchemy.Column(sqlalchemy.String)
+    answers = sqlalchemy.Column(sqlalchemy.String)
     done_by = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     adding = sqlalchemy.Column(sqlalchemy.String)

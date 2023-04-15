@@ -82,19 +82,23 @@ async def solve_tasks(update, context):
     right = True
     ans = update.message.text
     print(f'solve_tasks_right', context.user_data["right"])
-    if len(context.user_data["right"]) == len(ans) == len(set(ans)):
-        for i in ans:
-            print('i', i)
-            if not (i in context.user_data["right"]) or i in 'qwertyuiopasdfghjklzxcvbnmйцукенгшщзфывапролдячсмитьбюэъ':
-                right = False
-    else:
-        right = False
+    if ans != context.user_data["right"]:
+        if len(context.user_data["right"]) == len(ans) == len(set(ans)):
+            for i in ans:
+                print('i', i)
+                if not (i in context.user_data["right"]) or i in 'qwertyuiopasdfghjklzxcvbnmйцукенгшщзфывапролдячсмитьбюэъ':
+                    right = False
+        else:
+            right = False
+    sess = db_session.create_session()
+    now = sess.query(context.user_data["class"]).filter(
+        (context.user_data["class"].id == context.user_data["id"])).first()
     if right:
-        await update.message.reply_text('молодец!', reply_markup=markup_done)
-        sess = db_session.create_session()
-        now = sess.query(context.user_data["class"]).filter(
-            (context.user_data["class"].id == context.user_data["id"])).first()
         done = now.done_by
+        if  (now.done_by == None) or ('lalala' not in now.done_by):
+            await update.message.reply_text('молодец!', reply_markup=markup_done)
+        else:
+            await update.message.reply_text('не брехайся', reply_markup=markup_done)
         if not done:
             done = ''
         done += 'lalala'
@@ -102,7 +106,10 @@ async def solve_tasks(update, context):
         print('done_by_added')
         sess.commit()
     else:
-        await update.message.reply_text('попробуй еще', reply_markup=markup_while_asking)
+        if (now.done_by == None) or ('lalala' not in now.done_by):
+            await update.message.reply_text('попробуй еще', reply_markup=markup_while_asking)
+        else:
+            await update.message.reply_text('не брехайся', reply_markup=markup_done)
 
 
 
@@ -114,7 +121,7 @@ async def nine(update, context):
     unsolved = sess.query(class_of_task).filter(
         (class_of_task.done_by.not_like("%lalala%")) | (class_of_task.done_by == None)).first()
     if unsolved:
-        context.user_data["right"] = unsolved.answer
+        context.user_data["right"] = unsolved.answers
         context.user_data["class"] = class_of_task
         context.user_data["task"] = task
         context.user_data["id"] = unsolved.id
@@ -132,7 +139,7 @@ async def ten(update, context):
     unsolved = sess.query(class_of_task).filter(
         (class_of_task.done_by.not_like("%lalala%")) | (class_of_task.done_by == None)).first()
     if unsolved:
-        context.user_data["right"] = unsolved.answer
+        context.user_data["right"] = unsolved.answers
         context.user_data["class"] = class_of_task
         context.user_data["task"] = task
         context.user_data["id"] = unsolved.id
@@ -150,7 +157,7 @@ async def twelve(update, context):
     unsolved = sess.query(class_of_task).filter(
         (class_of_task.done_by.not_like("%lalala%")) | (class_of_task.done_by == None)).first()
     if unsolved:
-        context.user_data["right"] = unsolved.answer
+        context.user_data["right"] = unsolved.answers
         context.user_data["class"] = class_of_task
         context.user_data["task"] = task
         context.user_data["id"] = unsolved.id
@@ -168,7 +175,7 @@ async def thirteen(update, context):
     unsolved = sess.query(class_of_task).filter(
         (class_of_task.done_by.not_like("%lalala%")) | (class_of_task.done_by == None)).first()
     if unsolved:
-        context.user_data["right"] = unsolved.answer
+        context.user_data["right"] = unsolved.answers
         context.user_data["class"] = class_of_task
         context.user_data["task"] = task
         context.user_data["id"] = unsolved.id
@@ -185,7 +192,7 @@ async def fifteen(update, context):
     sess = db_session.create_session()
     unsolved = sess.query(class_of_task).filter((class_of_task.done_by.not_like("%lalala%")) | (class_of_task.done_by == None)).first()
     if unsolved:
-        context.user_data["right"] = unsolved.answer
+        context.user_data["right"] = unsolved.answers
         context.user_data["class"] = class_of_task
         context.user_data["task"] = task
         context.user_data["id"] = unsolved.id
@@ -203,7 +210,7 @@ async def sixteen(update, context):
     unsolved = sess.query(class_of_task).filter(
         (class_of_task.done_by.not_like("%lalala%")) | (class_of_task.done_by == None)).first()
     if unsolved:
-        context.user_data["right"] = unsolved.answer
+        context.user_data["right"] = unsolved.answers
         context.user_data["class"] = class_of_task
         context.user_data["task"] = task
         context.user_data["id"] = unsolved.id
@@ -218,7 +225,7 @@ async def how_to_answer(update, context):
     await update.message.reply_text('все как на экзамене: цифры в любом порядке без пробелов и иных символов', reply_markup=markup_while_asking)
 
 
-async def show_answer(update, context, *args):
+async def show_answer(update, context):
     sess = db_session.create_session()
     now = sess.query(context.user_data["class"]).filter(
         (context.user_data["class"].id == context.user_data["id"])).first()
@@ -236,7 +243,12 @@ async def exxit(update, context):
 
 
 async def again(update, context):
-    list_of_tasks_and_classes = {'15': fifteen(update, context)}
+    list_of_tasks_and_classes = {'15': fifteen(update, context),
+                                 '9': nine(update, context),
+                                 '10': ten(update, context),
+                                 '13': thirteen(update, context),
+                                 '16': sixteen(update, context),
+                                 '12': twelve(update, context)}
     await list_of_tasks_and_classes[context.user_data["task"]]
 
 

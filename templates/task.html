@@ -31,10 +31,17 @@
 {% if is_right == -1 and not is_hint %}
 <form method="post" id="two">
     <p align="center">
-    <button type="submit" class="btn btn-primary">Показать подсказку</button>
+    <button type="submit" name="hint" id="hint" class="btn btn-primary">Показать подсказку</button>
     </p>
 </form>
 {% elif is_hint %}
 <p align="center">{{ task.adding }}</p>
+{% endif %}
+{% if is_right %}
+<form method="post">
+    <p align="center">
+        <button type="submit" name="new_task" id="new_task" class="btn btn-primary">Выбрать новое задание</button>
+    </p>
+</form>
 {% endif %}
 {% endblock %}

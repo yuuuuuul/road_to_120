@@ -1,7 +1,7 @@
 import logging
 import random
 import os
-from data.tasks import Task9, Task15, Task10, Task12, Task13, Task16
+from data.tasks import Task9, Task15, Task10, Task12, Task13, Task16, Task5, Task4, Task14, Task11, Task17
 from werkzeug.security import generate_password_hash, check_password_hash
 from data.users import User
 from random import choice
@@ -24,12 +24,12 @@ logger = logging.getLogger(__name__)
 reply_keyboard = [['/help'],
                   ['/time_left', '/start_preparation']]
 
-reply_keyboard_tasks = [['/9', '/10', '/12'],
-                        ['/13', '/15', '/16']]
+reply_keyboard_tasks = [['/4', '/5', '/9', '/10', '/11', '/12'],
+                        ['/13', '/14', '/15', '/16', '/17']]
 
-reply_keyboard_asking = [['/how_to_ans', '/show_ans', '/fuck_off', '/go_to_all_tasks']]
-reply_keyboard_done = [['/next_task', '/fuck_off', '/go_to_all_tasks', '/show_adding']]
-reply_keyboard_lose = [['/show_adding', '/fuck_off', '/go_to_all_tasks']]
+reply_keyboard_asking = [['/how_to_ans', '/show_ans', '/exit', '/go_to_all_tasks']]
+reply_keyboard_done = [['/next_task', '/exit', '/go_to_all_tasks', '/show_adding']]
+reply_keyboard_lose = [['/show_adding', '/exit', '/go_to_all_tasks']]
 reply_keyboard_agression = [['/start_preparation']]
 reply_keyboard_getting_started = [['/registration', '/stop', '/enter']]
 
@@ -100,13 +100,13 @@ async def solve_tasks(update, context):
         done = now.done_by
         print(nickname, "nickname")
         if  (now.done_by == None) or (nickname not in now.done_by):
-            await update.message.reply_text(random.choice(['молодец!', 'неплохо)', 'а ты хорош!',
-                                                           'правильно!', 'угадал!', 'отлично!',
-                                                           'и не поспоришь! верно', 'и это правильный ответ!',
-                                                           'а ты умен!', 'браво, маэстро!']), reply_markup=markup_done)
+            await update.message.reply_text(random.choice(['Молодец!', 'Неплохо)', 'А ты хорош!',
+                                                           'Правильно!', 'Угадал!', 'Отлично!',
+                                                           'И не поспоришь! Верно', 'И это правильный ответ!',
+                                                           'А ты умен!', 'Браво, маэстро!']), reply_markup=markup_done)
         else:
             print('солв таскс не брехайся райт')
-            await update.message.reply_text('не брехайся', reply_markup=markup_done)
+            await update.message.reply_text('Не брехайся')
 
         if not done:
             done = ''
@@ -116,16 +116,61 @@ async def solve_tasks(update, context):
         sess.commit()
     else:
         if (now.done_by == None) or (nickname not in now.done_by):
-            await update.message.reply_text(random.choice(['попробуй еще', 'мимо', 'а если подумать?',
-                                                           'давай-ка еще попыточку', 'а вот и нет',
-                                                           'не попал', 'к сожалению, в молоко',
-                                                           'победа была близка, но ответ неверный', 'нет, но не сдавайся!',
-                                                           'в целом, было близко']), reply_markup=markup_while_asking)
+            await update.message.reply_text(random.choice(['Попробуй еще', 'мимо', 'А если подумать?',
+                                                           'Давай-ка еще попыточку', 'А вот и нет',
+                                                           'Не попал', 'К сожалению, в молоко',
+                                                           'Победа была близка, но ответ неверный', 'Нет, но не сдавайся!',
+                                                           'В целом, было близко']), reply_markup=markup_while_asking)
         else:
             print('солв таскс не брехайся не райт')
-            await update.message.reply_text('не брехайся', reply_markup=markup_done)
+            await update.message.reply_text('Не брехайся')
 
 
+
+async def four(update, context):
+    try:
+        if nickname:
+            task = '4'
+            class_of_task = Task4
+            sess = db_session.create_session()
+            unsolved = sess.query(class_of_task).filter(
+                (class_of_task.done_by.not_like(f"%{nickname}%")) | (class_of_task.done_by == None)).first()
+            if unsolved:
+                context.user_data["right"] = unsolved.answers
+                context.user_data["class"] = class_of_task
+                context.user_data["task"] = task
+                context.user_data["id"] = unsolved.id
+                context.user_data["adding"] = unsolved.adding
+                await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
+                return 1
+            else:
+                await update.message.reply_text('Задания кончились, иди поспи пж')
+    except Exception as e:
+        await update.message.reply_text('Сначала зарегистрируйся или войди',
+                                        reply_markup=markup_getting_started)
+
+
+async def five(update, context):
+    try:
+        if nickname:
+            task = '5'
+            class_of_task = Task5
+            sess = db_session.create_session()
+            unsolved = sess.query(class_of_task).filter(
+                (class_of_task.done_by.not_like(f"%{nickname}%")) | (class_of_task.done_by == None)).first()
+            if unsolved:
+                context.user_data["right"] = unsolved.answers
+                context.user_data["class"] = class_of_task
+                context.user_data["task"] = task
+                context.user_data["id"] = unsolved.id
+                context.user_data["adding"] = unsolved.adding
+                await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
+                return 1
+            else:
+                await update.message.reply_text('Задания кончились, иди поспи пж')
+    except Exception as e:
+        await update.message.reply_text('Сначала зарегистрируйся или войди',
+                                        reply_markup=markup_getting_started)
 
 
 async def nine(update, context):
@@ -145,7 +190,7 @@ async def nine(update, context):
                 await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
                 return 1
             else:
-                await update.message.reply_text('задания кончились, иди поспи пж')
+                await update.message.reply_text('Задания кончились, иди поспи пж')
     except Exception as e:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
@@ -168,7 +213,30 @@ async def ten(update, context):
                 await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
                 return 1
             else:
-                await update.message.reply_text('задания кончились, иди поспи пж')
+                await update.message.reply_text('Задания кончились, иди поспи пж')
+    except Exception as e:
+        await update.message.reply_text('Сначала зарегистрируйся или войди',
+                                        reply_markup=markup_getting_started)
+
+
+async def eleven(update, context):
+    try:
+        if nickname:
+            task = '11'
+            class_of_task = Task11
+            sess = db_session.create_session()
+            unsolved = sess.query(class_of_task).filter(
+                (class_of_task.done_by.not_like(f"%{nickname}%")) | (class_of_task.done_by == None)).first()
+            if unsolved:
+                context.user_data["right"] = unsolved.answers
+                context.user_data["class"] = class_of_task
+                context.user_data["task"] = task
+                context.user_data["id"] = unsolved.id
+                context.user_data["adding"] = unsolved.adding
+                await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
+                return 1
+            else:
+                await update.message.reply_text('Задания кончились, иди поспи пж')
     except Exception as e:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
@@ -190,7 +258,7 @@ async def twelve(update, context):
                 await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
                 return 1
             else:
-                await update.message.reply_text('задания кончились, иди поспи пж')
+                await update.message.reply_text('Задания кончились, иди поспи пж')
     except Exception as e:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
@@ -213,10 +281,34 @@ async def thirteen(update, context):
                 await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
                 return 1
             else:
-                await update.message.reply_text('задания кончились, иди поспи пж')
+                await update.message.reply_text('Задания кончились, иди поспи пж')
     except Exception as e:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
+
+
+async def fourteen(update, context):
+    try:
+        if nickname:
+            task = '14'
+            class_of_task = Task14
+            sess = db_session.create_session()
+            unsolved = sess.query(class_of_task).filter(
+                (class_of_task.done_by.not_like(f"%{nickname}%")) | (class_of_task.done_by == None)).first()
+            if unsolved:
+                context.user_data["right"] = unsolved.answers
+                context.user_data["class"] = class_of_task
+                context.user_data["task"] = task
+                context.user_data["id"] = unsolved.id
+                context.user_data["adding"] = unsolved.adding
+                await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
+                return 1
+            else:
+                await update.message.reply_text('Задания кончились, иди поспи пж')
+    except Exception as e:
+        await update.message.reply_text('Сначала зарегистрируйся или войди',
+                                        reply_markup=markup_getting_started)
+
 
 async def fifteen(update, context):
     try:
@@ -235,7 +327,7 @@ async def fifteen(update, context):
                 await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
                 return 1
             else:
-                await update.message.reply_text('задания кончились, иди поспи пж')
+                await update.message.reply_text('Задания кончились, иди поспи пж')
     except Exception as e:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
@@ -258,14 +350,36 @@ async def sixteen(update, context):
                 await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
                 return 1
             else:
-                await update.message.reply_text('задания кончились, иди поспи пж')
+                await update.message.reply_text('Задания кончились, иди поспи пж')
     except Exception as e:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
 
+async def seventeen(update, context):
+    try:
+        if nickname:
+            task = '17'
+            class_of_task = Task17
+            sess = db_session.create_session()
+            unsolved = sess.query(class_of_task).filter(
+                (class_of_task.done_by.not_like(f"%{nickname}%")) | (class_of_task.done_by == None)).first()
+            if unsolved:
+                context.user_data["right"] = unsolved.answers
+                context.user_data["class"] = class_of_task
+                context.user_data["task"] = task
+                context.user_data["id"] = unsolved.id
+                context.user_data["adding"] = unsolved.adding
+                await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
+                return 1
+            else:
+                await update.message.reply_text('Задания кончились, иди поспи пж')
+    except Exception as e:
+        await update.message.reply_text('Сначала зарегистрируйся или войди',
+                                        reply_markup=markup_getting_started)
+
 async def how_to_answer(update, context):
-    await update.message.reply_text('все как на экзамене: цифры в любом порядке без пробелов и иных символов', reply_markup=markup_while_asking)
+    await update.message.reply_text('Все как на экзамене: слова без пробелов и цифры в любом порядке без пробелов и иных символов', reply_markup=markup_while_asking)
 
 
 async def show_answer(update, context):
@@ -280,9 +394,10 @@ async def show_answer(update, context):
             done += nickname
             now.done_by = done
             sess.commit()
-            reply = ['рано сдался! а правильный ответ - ','жалко, что у тебя не получилось. Ответ - ',
-                      'ну нельзя же так быстро сдаваться. Ответ - ','в следующий раз пытайся думать чуть дольше. Ответ - ',
-                      'правильный ответ - ','а я думал, ты не сдашься. Правильный ответ - ']
+            reply = ['Рано сдался! А правильный ответ - ','Жалко, что у тебя не получилось. Ответ - ',
+                      'Ну нельзя же так быстро сдаваться. Ответ - ','В следующий раз пытайся думать чуть дольше. Ответ - ',
+                      'Правильный ответ - ','А я думал, ты не сдашься. Правильный ответ - ',
+                     'На самом деле все гораздо проще: ']
             a = random.choice(reply)
             await update.message.reply_text(a + context.user_data["right"], reply_markup=markup_done)
     except Exception as e:
@@ -307,7 +422,12 @@ async def again(update, context):
                                          '10': ten(update, context),
                                          '13': thirteen(update, context),
                                          '16': sixteen(update, context),
-                                         '12': twelve(update, context)}
+                                         '12': twelve(update, context),
+                                         '11': eleven(update, context),
+                                         '14': fourteen(update, context),
+                                         '17': seventeen(update, context),
+                                         '4': four(update, context),
+                                         '5': five(update, context),}
             await list_of_tasks_and_classes[context.user_data["task"]]
     except Exception as e:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
@@ -325,9 +445,9 @@ async def show_adding(update, context):
 
 async def registration(update, context):
     await update.message.reply_text(
-        "Привет. Спасибо, что решили воспользоваться нашим ботом!\n"
-        "Вы можете прервать регистрацию, послав команду /stop.\n"
-        "Введите свой никнейм:")
+        "Добро пожаловать на регистрацию!\n"
+        "Ты можешь прервать ее, послав команду /stop.\n"
+        "Введи свой никнейм:")
     return 2
     # Число-ключ в словаре states —
     # втором параметре ConversationHandler'а.
@@ -349,12 +469,12 @@ async def get_email_reg(update, context):
     if sess.query(User).filter(User.nickname == update.message.text).first():
         await update.message.reply_text(
             f"Пользователь с никнеймом {update.message.text} уже существует!\n"
-            "Попробуйте другой никнейм, если вы здесь впервые. Если же вы вспомнили,"
-            "что уже встречались со мной, то нажмите /stop, а затем /enter, чтобы войти в существующий аккаунт", reply_markup=markup_getting_started)
+            "Попробуй другой никнейм, если ты здесь впервые. Если же ты вспомнил,"
+            "что уже встречался со мной, то нажми /stop, а затем /enter, чтобы войти в существующий аккаунт", reply_markup=markup_getting_started)
         return 1
     context.user_data['nickname'] = update.message.text
     await update.message.reply_text(
-        f"Введите свой email:")
+        f"Введи свой email:")
     return 3
 
 
@@ -362,14 +482,14 @@ async def get_password_reg(update, context):
     if sess.query(User).filter(User.email == update.message.text).first():
         await update.message.reply_text(
             f"Пользователь с email'ом {update.message.text} уже существует!\n"
-            "Попробуйте другой email:")
+            "Попробуй другой email:")
         return 3
     if '@' not in update.message.text:
         await update.message.reply_text('Некорректный email')
         return 3
     context.user_data['email'] = update.message.text
     await update.message.reply_text(
-        f"Придумайте пароль")
+        f"Придумай пароль")
     return 4
 
 
@@ -377,14 +497,14 @@ async def get_password_reg(update, context):
 async def get_password_again_reg(update, context):
     context.user_data['password'] = update.message.text
     await update.message.reply_text(
-        f"Для подтверждения введите его ещё раз")
+        f"Для подтверждения введи его ещё раз")
     return 5
 
 
 async def get_finish_reg(update, context):
     if context.user_data['password'] != update.message.text:
         await update.message.reply_text(
-            f"Пароли не совпадают! Попробуйте ещё раз")
+            f"Пароли не совпадают! Попробуй ещё раз")
         return 5
     client.nickname = context.user_data['nickname']
     client.email = context.user_data['email']
@@ -406,9 +526,9 @@ async def stop(update, context):
 
 async def enter(update, context):
     await update.message.reply_text(
-        "Привет. Спасибо, что решили воспользоваться нашим ботом!\n"
-        "Вы можете прервать вход, послав команду /stop.\n"
-        "Введите свой никнейм:")
+        "Рад видеть!\n"
+        "Ты можешь прервать вход, послав команду /stop.\n"
+        "Введи свой никнейм:")
     return 1
 
 
@@ -416,34 +536,27 @@ async def get_nickname_log(update, context):
     if not sess.query(User).filter(User.nickname == update.message.text).first():
         await update.message.reply_text(
             f"Пользователя с никнеймом {update.message.text} нет!\n"
-            "Попробуйте зарегистрироваться, если вы здесь впервые: нажмите /stop, а затем /registration. Иначе,"
-            "введите никнейм корректно", reply_markup=markup_getting_started)
+            "Попробуй зарегистрироваться, если ты здесь впервые: нажми /stop, а затем /registration. Иначе"
+            "введи никнейм корректно", reply_markup=markup_getting_started)
         return 1
     context.user_data['nickname'] = update.message.text
     await update.message.reply_text(
-        f"Введите свой пароль:")
+        f"Введи свой пароль:")
     return 2
 
 
 async def get_password_log(update, context):
-    context.user_data['password'] = update.message.text
-    await update.message.reply_text(
-        f"Введите свой email:")
-    return 3
-
-
-async def get_email_log(update, context):
     global sess
-    user = sess.query(User).filter(User.email == update.message.text).first()
-    if user and user.check_password(context.user_data['password']):
+    user = sess.query(User).filter(User.nickname == context.user_data['nickname']).first()
+    if user and user.check_password(update.message.text):
         await update.message.reply_text(
-            f"Вы успешно вошли!", reply_markup=markup)
+            f"Ты успешно вошел!", reply_markup=markup)
         global nickname
         nickname = context.user_data["nickname"]
+        context.user_data.clear()
         return ConversationHandler.END
-    await update.message.reply_text('Неверный логин или пароль, попробуйте войти ещё раз, нажав /enter')
+    await update.message.reply_text('Неверный пароль, попробуй войти ещё раз, нажав /enter')
     return ConversationHandler.END
-
 
 def main():
 
@@ -496,8 +609,7 @@ def main():
         states={
             # Функция читает ответ на первый вопрос и задаёт второй.
             1: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_nickname_log)],
-            2: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_password_log)],
-            3: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_email_log)]
+            2: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_password_log)]
         },
 
         # Точка прерывания диалога. В данном случае — команда /stop.
@@ -514,15 +626,20 @@ def main():
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("time_left", time_left))
     application.add_handler(CommandHandler("start_preparation", start_preparation))
+    application.add_handler(CommandHandler('4', four))
+    application.add_handler(CommandHandler('5', five))
     application.add_handler(CommandHandler('9', nine))
     application.add_handler(CommandHandler('10', ten))
+    application.add_handler(CommandHandler('11', eleven))
     application.add_handler(CommandHandler('12', twelve))
     application.add_handler(CommandHandler('13', thirteen))
+    application.add_handler(CommandHandler('14', fourteen))
     application.add_handler(CommandHandler('15', fifteen))
     application.add_handler(CommandHandler('16', sixteen))
+    application.add_handler(CommandHandler('17', seventeen))
     application.add_handler(CommandHandler('how_to_ans', how_to_answer))
     application.add_handler(CommandHandler('show_ans', show_answer))
-    application.add_handler(CommandHandler('fuck_off', exxit))
+    application.add_handler(CommandHandler('exit', exxit))
     application.add_handler(CommandHandler('next_task', again))
     application.add_handler(CommandHandler('go_to_all_tasks', start_preparation))
     application.add_handler(CommandHandler('show_adding', show_adding))

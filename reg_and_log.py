@@ -7,6 +7,7 @@ from telegram.ext import CommandHandler
 from datetime import datetime
 from telegram import ReplyKeyboardMarkup
 import sqlite3
+import random
 from data import db_session
 from data.users import User
 from data.tasks import *

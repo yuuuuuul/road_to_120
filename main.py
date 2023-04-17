@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from data import db_session
+from flask_restful import Api
+from data import db_session, tasks_resource
 from data.users import User
 from data.tasks import *
 from forms.register import RegisterForm
@@ -9,10 +10,17 @@ import os
 import random
 
 CLASS_DICT = {9: Task9, 12: Task12, 10: Task10, 13: Task13, 15: Task15, 16: Task16}
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+api = Api(app)
+
+api.add_resource(tasks_resource.TasksResource, "/api/tasks/<int:category_id>/<int:task_id>")
+api.add_resource(tasks_resource.TasksListResource, "/api/tasks/<int:category_id>")
+
 login_manager = LoginManager()
 login_manager.init_app(app)
+
 db_session.global_init("db/ege_russian_project.db")
 SESS = db_session.create_session()
 
@@ -59,7 +67,7 @@ def register():
             return render_template('register.html', title='Регистрация',
                                    form=form, message='Пользователь с данной почтой уже есть')
         f = form.picture.data
-        f.save(os.path.join(os.getcwd(), f"static/img/avatars/{len(sess.query(User).all()) + 1}.jpg"))
+        f.save(os.path.join(os.getcwd(), f"static/img/avatars/{len(SESS.query(User).all()) + 1}.jpg"))
         user = User(
             nickname=form.nickname.data,
             email=form.email.data,

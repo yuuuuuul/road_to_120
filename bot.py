@@ -574,6 +574,11 @@ async def get_password_log(update, context):
     await update.message.reply_text('Неверный пароль, попробуй войти ещё раз, нажав /enter')
     return ConversationHandler.END
 
+
+async def stop(update, context):
+    return ConversationHandler.END
+
+
 def main():
 
     db_session.global_init("db/ege_russian_project.db")
@@ -612,7 +617,7 @@ def main():
         },
 
         # Точка прерывания диалога. В данном случае — команда /stop.
-        fallbacks=[CommandHandler('exit',exxit)]
+        fallbacks=[CommandHandler('stop', stop)]
     )
 
     conv_handler_log = ConversationHandler(
@@ -628,7 +633,7 @@ def main():
         },
 
         # Точка прерывания диалога. В данном случае — команда /stop.
-        fallbacks=[CommandHandler('exit', exxit)]
+        fallbacks=[CommandHandler('stop', stop)]
     )
 
     application.add_handler(conv_handler_reg)

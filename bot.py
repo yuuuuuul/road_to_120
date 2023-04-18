@@ -21,17 +21,17 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-reply_keyboard = [['/help'],
+reply_keyboard = [['/help', '/exit'],
                   ['/time_left', '/start_preparation']]
 
-reply_keyboard_tasks = [['/4', '/5', '/9', '/10', '/11', '/12'],
+reply_keyboard_tasks = [['/help','/exit'], [ '/4', '/5', '/9', '/10', '/11', '/12'],
                         ['/13', '/14', '/15', '/16', '/17']]
 
-reply_keyboard_asking = [['/how_to_ans', '/show_ans', '/exit', '/go_to_all_tasks']]
-reply_keyboard_done = [['/next_task', '/exit', '/go_to_all_tasks', '/show_adding']]
-reply_keyboard_lose = [['/show_adding', '/exit', '/go_to_all_tasks']]
+reply_keyboard_asking = [['/help', '/exit'], ['/how_to_ans', '/show_ans', '/go_to_all_tasks']]
+reply_keyboard_done = [['/help', '/exit'], ['/next_task', '/show_adding', '/go_to_all_tasks']]
+reply_keyboard_lose = [['/help', '/exit'], ['/show_adding', '/go_to_all_tasks']]
 reply_keyboard_agression = [['/start_preparation']]
-reply_keyboard_getting_started = [['/registration', '/stop', '/enter']]
+reply_keyboard_getting_started = [['/help', '/exit'], ['/registration', '/stop', '/enter']]
 
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
 markup_done = ReplyKeyboardMarkup(reply_keyboard_done, one_time_keyboard=False)
@@ -54,8 +54,19 @@ async def start(update, context):
 
 
 async def help_command(update, context):
-    await update.message.reply_text('Привет! Я - бот для подготовки к ЕГЭ по русскому языку. '
-                                    'Со мной ты можешь порешать задания тестовой части экзамена.')
+
+    await update.message.reply_text('Инструкция по общению со мной:\n'
+                                    'В поле команд ты увидишь кнопочки для управления диалогом:\n'
+                                    '/registration - зарегистрируйся, если ты здесь не был\n'
+                                    '/enter - войди, если уже общался со мной раньше\n'
+                                    '/how_to_ans - вдруг ты забыл, как надо отвечать на ЕГЭ\n'
+                                    '/time_left - узнай, сколько времени осталось до экзамена (но лучше иди сразу ботать)\n'
+                                    '/start_preparation - нажимай сюда, чтобы начать решать задания\n'
+                                    '/4 - подобные кнопки - чтобы открыть задание\n'
+                                    '/next_task - переход к следующему заданию этого типа (номера)\n'
+                                    '/show_ans - этой кнопкой лучше пренебречь, но если уже совсем никаких догадок - посмотреть ответ можно тут\n'
+                                    '/show_adding - если не понял, почему именно этот ответ - я объясню\n'
+                                    '/exit - если надоело решать, можешь выйти\n')
 
 
 async def time_left(update, context):
@@ -67,16 +78,23 @@ async def time_left(update, context):
     b = datetime.strptime(n, date_format)
 
     delta = a - b
-    await update.message.reply_text(f'До экзамена осталось {delta.days} дней! Тебе конец!',
-                                    reply_markup=markup_agression)
+    if str(delta.days)[-1] == '1':
 
+        await update.message.reply_text(f'До экзамена остался {delta.days} день! Тебе конец!',
+                                    reply_markup=markup_agression)
+    elif str(delta.days)[-1] in '234':
+        await update.message.reply_text(f'До экзамена осталось {delta.days} дня! Тебе конец!',
+                                        reply_markup=markup_agression)
+    elif str(delta.days)[-1] in '567890':
+        await update.message.reply_text(f'До экзамена осталось {delta.days} дней! Тебе конец!',
+                                        reply_markup=markup_agression)
 
 async def start_preparation(update, context):
     try:
         if nickname:
             await update.message.reply_text('Отлично! Какое задание будем тренировать?',
                                             reply_markup=markup_tasks)
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -145,7 +163,7 @@ async def four(update, context):
                 return 1
             else:
                 await update.message.reply_text('Задания кончились, иди поспи пж')
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -168,7 +186,7 @@ async def five(update, context):
                 return 1
             else:
                 await update.message.reply_text('Задания кончились, иди поспи пж')
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -191,7 +209,7 @@ async def nine(update, context):
                 return 1
             else:
                 await update.message.reply_text('Задания кончились, иди поспи пж')
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -214,7 +232,7 @@ async def ten(update, context):
                 return 1
             else:
                 await update.message.reply_text('Задания кончились, иди поспи пж')
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -237,7 +255,7 @@ async def eleven(update, context):
                 return 1
             else:
                 await update.message.reply_text('Задания кончились, иди поспи пж')
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -282,7 +300,7 @@ async def thirteen(update, context):
                 return 1
             else:
                 await update.message.reply_text('Задания кончились, иди поспи пж')
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -305,7 +323,7 @@ async def fourteen(update, context):
                 return 1
             else:
                 await update.message.reply_text('Задания кончились, иди поспи пж')
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -328,7 +346,7 @@ async def fifteen(update, context):
                 return 1
             else:
                 await update.message.reply_text('Задания кончились, иди поспи пж')
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -351,7 +369,7 @@ async def sixteen(update, context):
                 return 1
             else:
                 await update.message.reply_text('Задания кончились, иди поспи пж')
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -374,7 +392,7 @@ async def seventeen(update, context):
                 return 1
             else:
                 await update.message.reply_text('Задания кончились, иди поспи пж')
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -400,7 +418,7 @@ async def show_answer(update, context):
                      'На самом деле все гораздо проще: ']
             a = random.choice(reply)
             await update.message.reply_text(a + context.user_data["right"], reply_markup=markup_done)
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -409,7 +427,8 @@ async def exxit(update, context):
     try:
         if nickname:
             await update.message.reply_text('Захочешь еще порешать - заходи!', reply_markup=markup)
-    except Exception as e:
+            return ConversationHandler.END
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -429,7 +448,7 @@ async def again(update, context):
                                          '4': four(update, context),
                                          '5': five(update, context),}
             await list_of_tasks_and_classes[context.user_data["task"]]
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -438,7 +457,7 @@ async def again(update, context):
 async def show_adding(update, context):
     try:
         await update.message.reply_text(f'{context.user_data["adding"]}')
-    except Exception as e:
+    except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -520,9 +539,6 @@ async def get_finish_reg(update, context):
     return ConversationHandler.END
 
 
-async def stop(update, context):
-    return ConversationHandler.END
-
 
 async def enter(update, context):
     await update.message.reply_text(
@@ -536,7 +552,7 @@ async def get_nickname_log(update, context):
     if not sess.query(User).filter(User.nickname == update.message.text).first():
         await update.message.reply_text(
             f"Пользователя с никнеймом {update.message.text} нет!\n"
-            "Попробуй зарегистрироваться, если ты здесь впервые: нажми /stop, а затем /registration. Иначе"
+            "Попробуй зарегистрироваться, если ты здесь впервые: нажми /stop, а затем /registration. Иначе "
             "введи никнейм корректно", reply_markup=markup_getting_started)
         return 1
     context.user_data['nickname'] = update.message.text
@@ -575,7 +591,7 @@ def main():
             # Функция читает ответ на первый вопрос и задаёт второй.
             1: [MessageHandler(filters.TEXT & ~filters.COMMAND, solve_tasks)],
             },
-        fallbacks=[CommandHandler('stop', stop)]
+        fallbacks=[CommandHandler('exit', exxit)]
 
     )
     conv_handler_reg = ConversationHandler(
@@ -596,7 +612,7 @@ def main():
         },
 
         # Точка прерывания диалога. В данном случае — команда /stop.
-        fallbacks=[CommandHandler('stop', stop)]
+        fallbacks=[CommandHandler('exit',exxit)]
     )
 
     conv_handler_log = ConversationHandler(
@@ -613,7 +629,7 @@ def main():
         },
 
         # Точка прерывания диалога. В данном случае — команда /stop.
-        fallbacks=[CommandHandler('stop', stop)]
+        fallbacks=[CommandHandler('exit', exxit)]
     )
 
     application.add_handler(conv_handler_reg)

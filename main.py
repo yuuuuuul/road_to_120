@@ -40,7 +40,10 @@ def logout():
 @app.route("/profile", methods=["GET"])
 @login_required
 def profile():
-    return render_template("profile.html", title=f'Профиль {current_user.nickname}')
+    find_picture = False
+    if current_user.picture:
+        find_picture = True
+    return render_template("profile.html", title=f'Профиль {current_user.nickname}', find_picture=find_picture)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -66,13 +69,14 @@ def register():
         if SESS.query(User).filter(User.nickname == form.nickname.data).first():
             return render_template('register.html', title='Регистрация',
                                    form=form, message='Пользователь с данной почтой уже есть')
-        f = form.picture.data
-        f.save(os.path.join(os.getcwd(), f"static/img/avatars/{len(SESS.query(User).all()) + 1}.jpg"))
         user = User(
             nickname=form.nickname.data,
-            email=form.email.data,
-            picture=f"{len(SESS.query(User).all()) + 1}.jpg"
+            email=form.email.data
         )
+        f = form.picture.data
+        if f.filename:
+            f.save(os.path.join(os.getcwd(), f"static/img/avatars/{len(SESS.query(User).all()) + 1}.jpg"))
+            user.picture = f"{len(SESS.query(User).all()) + 1}.jpg"
         user.set_password(form.password.data)
         SESS.add(user)
         SESS.commit()
@@ -125,13 +129,13 @@ def show_task(category, id_task):
 
 
 def get_task(category):
-    random_tasks = SESS.query(CLASS_DICT[category]).filter(
-        CLASS_DICT[category].done_by.notlike(f'%{current_user.id}%')).all()
+    random_tasks = SESS.query(CLASS_DICT[category]).all()
     # print(len(random_tasks))
-    if not random_tasks:
-        return redirect(f"/congratulations/{category}")
-    random_task = random.choice(random_tasks)
-    return redirect(f"/category_task/{category}/task/{random_task.id}")
+    random.shuffle(random_tasks)
+    for task in random_tasks:
+        if not task.done_by or not (str(current_user.id) in task.done_by):
+            return redirect(f"/category_task/{category}/task/{task.id}")
+    return redirect(f"/congratulations/{category}")
 
 
 def main():

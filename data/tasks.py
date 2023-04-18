@@ -24,7 +24,6 @@ class Task10(SqlAlchemyBase, SerializerMixin):
     adding = sqlalchemy.Column(sqlalchemy.String)
 
 
-
 class Task11(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'task_11'
 

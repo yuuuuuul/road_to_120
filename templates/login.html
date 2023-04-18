@@ -1,28 +1,40 @@
 {% extends "base.html" %}
 
+{% block css %}
+<style>html {background-image: url(../static/img/background.jpg);}</style>
+<link rel="stylesheet" href="../static/css/background.css">
+<link rel="stylesheet" href="../static/css/text.css">
+<link rel="stylesheet" href="../static/css/gradient-button.css">
+<link rel="stylesheet" href="../static/css/input.css">
+{% endblock %}
+
 {% block content %}
 <h1>Login</h1>
-<form action="" method="post" enctype="multipart/form-data" novalidate>
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.email.label }}<br>
-        {{ form.email(class="form-control") }}<br>
+<div class="box">
+    <form action="" method="post" enctype="multipart/form-data" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+        <div class="input-container" align="center">{{ form.email(type="text", class="form-control") }}
+            <label>{{ form.email.label }}</label>
+        </div>
         {% for error in form.email.errors %}
-    <p class="alert alert-danger" role="alert">
-        {{ error }}
-    </p>
-    {% endfor %}
-    </p>
-    <p>
-        {{ form.password.label }}<br>
-        {{ form.password(class="form-control", type="password") }}<br>
+        <p class="alert alert-danger" role="alert">
+            {{ error }}
+        </p>
+        {% endfor %}
+        </p>
+        <p>
+        <div class="input-container" align="center">{{ form.password(class="form-control", type="password") }}
+            <label>{{ form.password.label }}</label>
+        </div>
         {% for error in form.password.errors %}
-    <p class="alert alert-danger" role="alert">
-        {{ error }}
-    </p>
-    {% endfor %}
-    </p>
-    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-    {{message}}
-</form>
+        <p class="alert alert-danger" role="alert">
+            {{ error }}
+        </p>
+        {% endfor %}
+        </p>
+        <p>{{ form.submit(type="submit", class="gradient-button") }}</p>
+        {{message}}
+    </form>
+</div>
 {% endblock %}

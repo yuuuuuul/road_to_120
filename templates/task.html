@@ -1,37 +1,47 @@
 {% extends "base.html" %}
 
 {% block css %}
-<link rel="stylesheet" href="../../../../static/css/drop-down_list.css" type="text/css">
-{% if is_right == 1 %}
-    <style>body {background-color: rgb(133, 205, 140);}</style>
-{% elif is_right == -1 %}
-    <style>body {background-color: rgb(224, 105, 105);}</style>
-{% endif %}
+<style>html {background-image: url(../../../../static/img/background.jpg);}</style>
+<link rel="stylesheet" href="../../../../static/css/side_panel.css" type="text/css">
+<link rel="stylesheet" href="../../../../static/css/background.css">
+<link rel="stylesheet" href="../../../../static/css/text.css">
+<link rel="stylesheet" href="../../../../static/css/gradient-button.css">
+<link rel="stylesheet" href="../../../../static/css/red-gradient-button.css">
+<link rel="stylesheet" href="../../../../static/css/green-gradient-button.css">
+<link rel="stylesheet" href="../../../../static/css/input.css">
 {% endblock %}
 
 {% block script %}
-<script language="JavaScript" src="../../../../static/javascript/drop-down_list.js"></script>
+<script language="JavaScript" src="../../../../static/javascript/side_panel.js"></script>
 {% endblock %}
 
 {% block content %}
 <h1 align="center">Задание {{ category }}.{{ task.id }}</h1>
 <p align="center">{{ task.text_of_the_task }}</p>
-<form method="post" id="one">
-    <p align="center">
-    <input type="text" class="form-control" id="answer" placeholder="Введите ответ:" name="answer">
+<div class="box">
+    <form method="post" id="one">
+        <p align="center">
+        <div class="input-container">
+            <input type="text" class="form-control" id="answer" name="answer" align="center">
+            <label>Введите ответ</label>
+        </div>
         {% if is_right == 1 %}
-        <button disabled type="submit" class="btn btn-primary">Отправить ответ</button>
+        <button disabled type="submit" class="green-gradient-button">Отправить ответ</button>
+        {% elif is_right == -1 %}
+        <button type="submit" class="red-gradient-button">Отправить ответ</button>
         {% else %}
-        <button type="submit" class="btn btn-primary">Отправить ответ</button>
+        <button type="submit" class="gradient-button">Отправить ответ</button>
         {% endif %}
 
-    </p>
-</form>
+        </p>
+    </form>
+</div>
+<br><br><br><br><br><br><br><br><br><br><br><br>
 <p align="center">{{ message }}</p>
 {% if is_right == -1 and not is_hint %}
 <form method="post" id="two">
     <p align="center">
-    <button type="submit" name="hint" id="hint" class="btn btn-primary">Показать подсказку</button>
+        <button type="submit" name="hint" id="hint" class="gradient-button">Показать подсказку</button>
     </p>
 </form>
 {% elif is_hint %}
@@ -40,7 +50,7 @@
 {% if is_right %}
 <form method="post">
     <p align="center">
-        <button type="submit" name="new_task" id="new_task" class="btn btn-primary">Выбрать новое задание</button>
+        <button type="submit" name="new_task" id="new_task" class="gradient-button">Выбрать новое задание</button>
     </p>
 </form>
 {% endif %}

@@ -1,16 +1,24 @@
 {% extends "base.html" %}
 
 {% block css %}
-<link rel="stylesheet" href="./static/css/drop-down_list.css" type="text/css">
+<style>html {background-image: url(../static/img/background.jpg);}</style>
+<link rel="stylesheet" href="../static/css/side_panel.css" type="text/css">
+<link rel="stylesheet" href="../static/css/background.css">
+<link rel="stylesheet" href="../static/css/gradient-button.css">
+<link rel="stylesheet" href="../static/css/text.css">
 {% endblock %}
 
 {% block script %}
-<script language="JavaScript" src="./static/javascript/drop-down_list.js"></script>
+<script language="JavaScript" src="./static/javascript/side_panel.js"></script>
 {% endblock %}
 
 {% block content %}
 <p>
-  <img src="static/img/avatars/{{ current_user.id }}.jpg" width="128" height="128">
+    {% if find_picture %}
+    <img src="static/img/avatars/{{ current_user.id }}.jpg" width="128" height="128">
+    {% elif not find_picture %}
+    <img src="static/img/avatars/undefined_avatar.jpg" width="128" height="128">
+    {% endif %}
 </p>
 <p>Никнейм: {{ current_user.nickname }}</p>
 <p>Решено заданий: {{ current_user.task_completed }}</p>

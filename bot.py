@@ -21,17 +21,17 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-reply_keyboard = [['/help', '/exit'],
+reply_keyboard = [['/help'],
                   ['/time_left', '/start_preparation']]
 
-reply_keyboard_tasks = [['/help','/exit'], [ '/4', '/5', '/9', '/10', '/11', '/12'],
-                        ['/13', '/14', '/15', '/16', '/17']]
+reply_keyboard_tasks = [[ '/4', '/5', '/9', '/10', '/11', '/12'],
+                        ['/13', '/14', '/15', '/16', '/17'], ['/help']]
 
-reply_keyboard_asking = [['/help', '/exit'], ['/how_to_ans', '/show_ans', '/go_to_all_tasks']]
-reply_keyboard_done = [['/help', '/exit'], ['/next_task', '/show_adding', '/go_to_all_tasks']]
-reply_keyboard_lose = [['/help', '/exit'], ['/show_adding', '/go_to_all_tasks']]
+reply_keyboard_asking = [['/how_to_ans', '/show_ans', '/go_to_all_tasks'], ['/help']]
+reply_keyboard_done = [['/next_task', '/show_adding', '/go_to_all_tasks'], ['/help']]
+reply_keyboard_lose = [['/show_adding', '/go_to_all_tasks'], ['/help']]
 reply_keyboard_agression = [['/start_preparation']]
-reply_keyboard_getting_started = [['/help', '/exit'], ['/registration', '/stop', '/enter']]
+reply_keyboard_getting_started = [['/registration', '/stop', '/enter'], ['/help']]
 
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
 markup_done = ReplyKeyboardMarkup(reply_keyboard_done, one_time_keyboard=False)
@@ -103,7 +103,7 @@ async def solve_tasks(update, context):
     right = True
     ans = update.message.text
     print(f'solve_tasks_right', context.user_data["right"])
-    if ans.lower() != context.user_data["right"]:
+    if ans.lower() != context.user_data["right"].lower():
         if len(context.user_data["right"]) == len(ans) == len(set(ans)):
             for i in ans:
                 print('i', i)
@@ -173,6 +173,28 @@ async def five(update, context):
         if nickname:
             task = '5'
             class_of_task = Task5
+            sess = db_session.create_session()
+            unsolved = sess.query(class_of_task).filter(
+                (class_of_task.done_by.not_like(f"%{nickname}%")) | (class_of_task.done_by == None)).first()
+            if unsolved:
+                context.user_data["right"] = unsolved.answers
+                context.user_data["class"] = class_of_task
+                context.user_data["task"] = task
+                context.user_data["id"] = unsolved.id
+                context.user_data["adding"] = unsolved.adding
+                await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
+                return 1
+            else:
+                await update.message.reply_text('Задания кончились, иди поспи пж')
+    except NameError:
+        await update.message.reply_text('Сначала зарегистрируйся или войди',
+                                        reply_markup=markup_getting_started)
+
+async def six(update, context):
+    try:
+        if nickname:
+            task = '6'
+            class_of_task = Task6
             sess = db_session.create_session()
             unsolved = sess.query(class_of_task).filter(
                 (class_of_task.done_by.not_like(f"%{nickname}%")) | (class_of_task.done_by == None)).first()
@@ -423,15 +445,6 @@ async def show_answer(update, context):
                                         reply_markup=markup_getting_started)
 
 
-async def exxit(update, context):
-    try:
-        if nickname:
-            await update.message.reply_text('Захочешь еще порешать - заходи!', reply_markup=markup)
-            return ConversationHandler.END
-    except NameError:
-        await update.message.reply_text('Сначала зарегистрируйся или войди',
-                                        reply_markup=markup_getting_started)
-
 
 async def again(update, context):
     try:
@@ -446,7 +459,8 @@ async def again(update, context):
                                          '14': fourteen(update, context),
                                          '17': seventeen(update, context),
                                          '4': four(update, context),
-                                         '5': five(update, context),}
+                                         '5': five(update, context),
+                                         '6': six(update, context),}
             await list_of_tasks_and_classes[context.user_data["task"]]
     except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
@@ -574,6 +588,11 @@ async def get_password_log(update, context):
     await update.message.reply_text('Неверный пароль, попробуй войти ещё раз, нажав /enter')
     return ConversationHandler.END
 
+
+async def stop(update, context):
+    return ConversationHandler.END
+
+
 def main():
 
     db_session.global_init("db/ege_russian_project.db")
@@ -582,8 +601,10 @@ def main():
     conv_handler = ConversationHandler(
         # Точка входа в диалог.
         # В данном случае — команда /start. Она задаёт первый вопрос.
-        entry_points=[CommandHandler('9', nine), CommandHandler('10', ten), CommandHandler('12', twelve),
-                      CommandHandler('13', thirteen), CommandHandler('15', fifteen), CommandHandler('16', sixteen)],
+        entry_points=[CommandHandler('4', four), CommandHandler('5', five), CommandHandler('6', six),
+                      CommandHandler('9', nine), CommandHandler('10', ten), CommandHandler('11', eleven),
+                      CommandHandler('12', twelve), CommandHandler('13', thirteen), CommandHandler('14', fourteen),
+                      CommandHandler('15', fifteen), CommandHandler('16', sixteen), CommandHandler('17', seventeen)],
 
         # Состояние внутри диалога.
         # Вариант с двумя обработчиками, фильтрующими текстовые сообщения.
@@ -591,7 +612,7 @@ def main():
             # Функция читает ответ на первый вопрос и задаёт второй.
             1: [MessageHandler(filters.TEXT & ~filters.COMMAND, solve_tasks)],
             },
-        fallbacks=[CommandHandler('exit', exxit)]
+        fallbacks=[CommandHandler('stop', stop)]
 
     )
     conv_handler_reg = ConversationHandler(
@@ -612,7 +633,7 @@ def main():
         },
 
         # Точка прерывания диалога. В данном случае — команда /stop.
-        fallbacks=[CommandHandler('exit',exxit)]
+        fallbacks=[CommandHandler('stop', stop)]
     )
 
     conv_handler_log = ConversationHandler(
@@ -628,7 +649,7 @@ def main():
         },
 
         # Точка прерывания диалога. В данном случае — команда /stop.
-        fallbacks=[CommandHandler('exit', exxit)]
+        fallbacks=[CommandHandler('stop', stop)]
     )
 
     application.add_handler(conv_handler_reg)
@@ -643,6 +664,7 @@ def main():
     application.add_handler(CommandHandler("start_preparation", start_preparation))
     application.add_handler(CommandHandler('4', four))
     application.add_handler(CommandHandler('5', five))
+    application.add_handler(CommandHandler('6', six))
     application.add_handler(CommandHandler('9', nine))
     application.add_handler(CommandHandler('10', ten))
     application.add_handler(CommandHandler('11', eleven))

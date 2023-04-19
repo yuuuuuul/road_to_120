@@ -12,8 +12,8 @@ from forms.add_tasks import AddTaskForm
 import os
 import random
 
-CLASS_DICT = {4: Task4, 5: Task5, 6: Task6, 9: Task9, 10: Task10, 11: Task11, 12: Task12, 13: Task13, 14: Task14,
-              15: Task15, 16: Task16, 17: Task17}
+CLASS_DICT = {4: Task4, 5: Task5, 6: Task6, 7: Task7, 9: Task9, 10: Task10, 11: Task11, 12: Task12, 13: Task13,
+              14: Task14, 15: Task15, 16: Task16, 17: Task17, 18: Task18, 21: Task21}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'

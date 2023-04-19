@@ -1,17 +1,15 @@
 import logging
 import random
-import os
-from data.tasks import Task9, Task15, Task10, Task12, Task13, Task16, Task5, Task4, Task14, Task11, Task17
-from werkzeug.security import generate_password_hash, check_password_hash
+from data.tasks import *
+from werkzeug.security import generate_password_hash
 from data.users import User
-from random import choice
 from data import db_session
 from telegram.ext import Application, MessageHandler, filters, ConversationHandler
 from config import BOT_TOKEN
 from telegram.ext import CommandHandler
 from datetime import datetime
 from telegram import ReplyKeyboardMarkup
-import sqlite3
+from main import main
 
 
 
@@ -24,8 +22,8 @@ logger = logging.getLogger(__name__)
 reply_keyboard = [['/help'],
                   ['/time_left', '/start_preparation']]
 
-reply_keyboard_tasks = [[ '/4', '/5', '/9', '/10', '/11', '/12'],
-                        ['/13', '/14', '/15', '/16', '/17'], ['/help']]
+reply_keyboard_tasks = [[ '/4', '/5', '/6', '/7', '/9', '/10', '/11', '/12'],
+                        ['/13', '/14', '/15', '/16', '/17', '/18', '/21'], ['/help']]
 
 reply_keyboard_asking = [['/how_to_ans', '/show_ans', '/go_to_all_tasks'], ['/help']]
 reply_keyboard_done = [['/next_task', '/show_adding', '/go_to_all_tasks'], ['/help']]
@@ -90,6 +88,7 @@ async def time_left(update, context):
                                         reply_markup=markup_agression)
 
 async def start_preparation(update, context):
+    context.user_data.clear()
     try:
         if nickname:
             await update.message.reply_text('Отлично! Какое задание будем тренировать?',
@@ -195,6 +194,29 @@ async def six(update, context):
         if nickname:
             task = '6'
             class_of_task = Task6
+            sess = db_session.create_session()
+            unsolved = sess.query(class_of_task).filter(
+                (class_of_task.done_by.not_like(f"%{nickname}%")) | (class_of_task.done_by == None)).first()
+            if unsolved:
+                context.user_data["right"] = unsolved.answers
+                context.user_data["class"] = class_of_task
+                context.user_data["task"] = task
+                context.user_data["id"] = unsolved.id
+                context.user_data["adding"] = unsolved.adding
+                await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
+                return 1
+            else:
+                await update.message.reply_text('Задания кончились, иди поспи пж')
+    except NameError:
+        await update.message.reply_text('Сначала зарегистрируйся или войди',
+                                        reply_markup=markup_getting_started)
+
+
+async def seven(update, context):
+    try:
+        if nickname:
+            task = '7'
+            class_of_task = Task7
             sess = db_session.create_session()
             unsolved = sess.query(class_of_task).filter(
                 (class_of_task.done_by.not_like(f"%{nickname}%")) | (class_of_task.done_by == None)).first()
@@ -418,6 +440,53 @@ async def seventeen(update, context):
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
+
+async def eighteen(update, context):
+    try:
+        if nickname:
+            task = '18'
+            class_of_task = Task18
+            sess = db_session.create_session()
+            unsolved = sess.query(class_of_task).filter(
+                (class_of_task.done_by.not_like(f"%{nickname}%")) | (class_of_task.done_by == None)).first()
+            if unsolved:
+                context.user_data["right"] = unsolved.answers
+                context.user_data["class"] = class_of_task
+                context.user_data["task"] = task
+                context.user_data["id"] = unsolved.id
+                context.user_data["adding"] = unsolved.adding
+                await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
+                return 1
+            else:
+                await update.message.reply_text('Задания кончились, иди поспи пж')
+    except NameError:
+        await update.message.reply_text('Сначала зарегистрируйся или войди',
+                                        reply_markup=markup_getting_started)
+
+
+async def twenty_one(update, context):
+    try:
+        if nickname:
+            task = '21'
+            class_of_task = Task21
+            sess = db_session.create_session()
+            unsolved = sess.query(class_of_task).filter(
+                (class_of_task.done_by.not_like(f"%{nickname}%")) | (class_of_task.done_by == None)).first()
+            if unsolved:
+                context.user_data["right"] = unsolved.answers
+                context.user_data["class"] = class_of_task
+                context.user_data["task"] = task
+                context.user_data["id"] = unsolved.id
+                context.user_data["adding"] = unsolved.adding
+                await update.message.reply_text(unsolved.text_of_the_task, reply_markup=markup_while_asking)
+                return 1
+            else:
+                await update.message.reply_text('Задания кончились, иди поспи пж')
+    except NameError:
+        await update.message.reply_text('Сначала зарегистрируйся или войди',
+                                        reply_markup=markup_getting_started)
+
+
 async def how_to_answer(update, context):
     await update.message.reply_text('Все как на экзамене: слова без пробелов и цифры в любом порядке без пробелов и иных символов', reply_markup=markup_while_asking)
 
@@ -460,7 +529,10 @@ async def again(update, context):
                                          '17': seventeen(update, context),
                                          '4': four(update, context),
                                          '5': five(update, context),
-                                         '6': six(update, context),}
+                                         '6': six(update, context),
+                                         '7': seven(update, context),
+                                         '21': twenty_one(update, context),
+                                         '18': eighteen(update, context)}
             await list_of_tasks_and_classes[context.user_data["task"]]
     except NameError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
@@ -471,7 +543,7 @@ async def again(update, context):
 async def show_adding(update, context):
     try:
         await update.message.reply_text(f'{context.user_data["adding"]}')
-    except NameError:
+    except NameError and KeyError:
         await update.message.reply_text('Сначала зарегистрируйся или войди',
                                         reply_markup=markup_getting_started)
 
@@ -594,7 +666,6 @@ async def stop(update, context):
 
 
 def main():
-
     db_session.global_init("db/ege_russian_project.db")
     application = Application.builder().token(BOT_TOKEN).build()
     text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, solve_tasks)
@@ -602,9 +673,11 @@ def main():
         # Точка входа в диалог.
         # В данном случае — команда /start. Она задаёт первый вопрос.
         entry_points=[CommandHandler('4', four), CommandHandler('5', five), CommandHandler('6', six),
+                      CommandHandler('7', seven),
                       CommandHandler('9', nine), CommandHandler('10', ten), CommandHandler('11', eleven),
                       CommandHandler('12', twelve), CommandHandler('13', thirteen), CommandHandler('14', fourteen),
-                      CommandHandler('15', fifteen), CommandHandler('16', sixteen), CommandHandler('17', seventeen)],
+                      CommandHandler('15', fifteen), CommandHandler('16', sixteen), CommandHandler('17', seventeen),
+                      CommandHandler('18', eighteen), CommandHandler('21', twenty_one)],
 
         # Состояние внутри диалога.
         # Вариант с двумя обработчиками, фильтрующими текстовые сообщения.
@@ -674,9 +747,10 @@ def main():
     application.add_handler(CommandHandler('15', fifteen))
     application.add_handler(CommandHandler('16', sixteen))
     application.add_handler(CommandHandler('17', seventeen))
+    application.add_handler(CommandHandler('18', eighteen))
+    application.add_handler(CommandHandler('21', twenty_one))
     application.add_handler(CommandHandler('how_to_ans', how_to_answer))
     application.add_handler(CommandHandler('show_ans', show_answer))
-    application.add_handler(CommandHandler('exit', exxit))
     application.add_handler(CommandHandler('next_task', again))
     application.add_handler(CommandHandler('go_to_all_tasks', start_preparation))
     application.add_handler(CommandHandler('show_adding', show_adding))

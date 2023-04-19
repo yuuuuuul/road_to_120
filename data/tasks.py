@@ -34,6 +34,16 @@ class Task6(SqlAlchemyBase, SerializerMixin):
     adding = sqlalchemy.Column(sqlalchemy.String)
 
 
+class Task7(SqlAlchemyBase, SerializerMixin):
+    __tablename__ = 'task_7'
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    text_of_the_task = sqlalchemy.Column(sqlalchemy.String)
+    answers = sqlalchemy.Column(sqlalchemy.String)
+    done_by = sqlalchemy.Column(sqlalchemy.String, default="")
+    adding = sqlalchemy.Column(sqlalchemy.String)
+
+
 class Task9(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'task_9'
 
@@ -117,6 +127,27 @@ class Task16(SqlAlchemyBase, SerializerMixin):
 
 class Task17(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'task_17'
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    text_of_the_task = sqlalchemy.Column(sqlalchemy.String)
+    answers = sqlalchemy.Column(sqlalchemy.String)
+    done_by = sqlalchemy.Column(sqlalchemy.String, default="")
+    adding = sqlalchemy.Column(sqlalchemy.String)
+
+
+class Task18(SqlAlchemyBase, SerializerMixin):
+    __tablename__ = 'task_18'
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    text_of_the_task = sqlalchemy.Column(sqlalchemy.String)
+    answers = sqlalchemy.Column(sqlalchemy.String)
+    done_by = sqlalchemy.Column(sqlalchemy.String, default="")
+    adding = sqlalchemy.Column(sqlalchemy.String)
+
+
+
+class Task21(SqlAlchemyBase, SerializerMixin):
+    __tablename__ = 'task_21'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     text_of_the_task = sqlalchemy.Column(sqlalchemy.String)

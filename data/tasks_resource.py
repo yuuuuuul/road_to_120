@@ -5,7 +5,7 @@ from .tasks_parser import parser
 from . import db_session
 from .tasks import *
 
-CLASS_DICT = {9: Task9, 12: Task12, 10: Task10, 13: Task13, 15: Task15, 16: Task16}
+CLASS_DICT = {4: Task4, 5: Task5, 6: Task6, 9: Task9, 10: Task10, 11: Task11, 12: Task12,  13: Task13, 14: Task14, 15: Task15, 16: Task16, 17: Task17}
 
 
 def abort_if_tasks_not_found(category_id, task_id):

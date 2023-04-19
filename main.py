@@ -1,15 +1,19 @@
 from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import Api
-from data import db_session, tasks_resource
+from data import db_session, tasks_resource, users_resource
 from data.users import User
 from data.tasks import *
 from forms.register import RegisterForm
 from forms.login import LoginForm
+from forms.redact import RedactForm
+from forms.change_password import ChangePasswordForm
+from forms.add_tasks import AddTaskForm
 import os
 import random
 
-CLASS_DICT = {9: Task9, 12: Task12, 10: Task10, 13: Task13, 15: Task15, 16: Task16}
+CLASS_DICT = {4: Task4, 5: Task5, 6: Task6, 9: Task9, 10: Task10, 11: Task11, 12: Task12, 13: Task13, 14: Task14,
+              15: Task15, 16: Task16, 17: Task17}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -17,6 +21,8 @@ api = Api(app)
 
 api.add_resource(tasks_resource.TasksResource, "/api/tasks/<int:category_id>/<int:task_id>")
 api.add_resource(tasks_resource.TasksListResource, "/api/tasks/<int:category_id>")
+api.add_resource(users_resource.UsersResource, "/api/users/<int:user_id>")
+api.add_resource(users_resource.UsersListResource, "/api/users")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -44,6 +50,67 @@ def profile():
     if current_user.picture:
         find_picture = True
     return render_template("profile.html", title=f'Профиль {current_user.nickname}', find_picture=find_picture)
+
+
+@app.route("/password_change", methods=["GET", "POST"])
+@login_required
+def password_change():
+    form = ChangePasswordForm()
+    user = SESS.query(User).filter(User.id == current_user.id).first()
+    if form.validate_on_submit():
+        if form.password.data != form.password_again.data:
+            return render_template("change_password.html", title="Смена пароля", form=form,
+                                   message="Пароли не совпадают")
+        user.set_password(form.password.data)
+        SESS.commit()
+        return redirect("/profile")
+    return render_template("change_password.html", title="Смена пароля", form=form)
+
+
+@app.route("/profile_redact", methods=['GET', 'POST'])
+@login_required
+def profile_redact():
+    form = RedactForm()
+    user = SESS.query(User).filter(User.id == current_user.id).first()
+    if request.method == 'GET':
+        form.nickname.data = user.nickname
+        form.email.data = user.email
+        form.picture.data = user.picture
+    if form.validate_on_submit():
+        if SESS.query(User).filter((User.email == form.email.data) & (User.id != user.id)).first():
+            return render_template("redact.html", title="Редактирование информации",
+                                   form=form, message="Пользователь с данной почтой уже существует")
+        if SESS.query(User).filter((User.nickname == form.nickname.data) & (User.id != user.id)).first():
+            return render_template("redact.html", title="Редактирование информации",
+                                   form=form, message="Пользователь с данным именем уже существует")
+        user.nickname = form.nickname.data
+        user.email = form.email.data
+        f = form.picture.data
+        if f.filename:
+            f.save(os.path.join(os.getcwd(), f"static/img/avatars/{user.id}.jpg"))
+        SESS.commit()
+        return redirect("/profile")
+    return render_template("redact.html", title="Редактирование информации",
+                           form=form)
+
+
+@app.route("/add_task", methods=['GET', "POST"])
+@login_required
+def add_task():
+    form = AddTaskForm()
+    if form.validate_on_submit():
+        if not form.category.data in CLASS_DICT.keys():
+            return render_template("add_tasks.html", title="Добавление задания", form=form,
+                                   message="Категория не найдена")
+        new_task = CLASS_DICT[form.category.data](
+            text_of_the_task=form.text_of_the_task.data,
+            answers=form.answers.data,
+            adding=form.adding.data
+        )
+        SESS.add(new_task)
+        SESS.commit()
+        return redirect("/")
+    return render_template("add_tasks.html", title="Добавление задания", form=form)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -100,6 +167,14 @@ def main_screen():
 @login_required
 def congratulations(category):
     return render_template("congratulations.html", title="Поздравляем!", category=category)
+
+
+@app.route("/example_task", methods=["GET"])
+def example_task():
+    category = 12
+    task = SESS.query(CLASS_DICT[category]).get(1)
+    return render_template('example_task.html', title="Пример задания", category=category, task=task,
+                           message="Пример задания! Для проверки ответов зарегистрируйтесь/авторизуйтесь на сайте :)")
 
 
 @app.route("/category_task/<int:category>/task/<int:id_task>", methods=["GET", "POST"])

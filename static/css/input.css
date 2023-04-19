@@ -10,8 +10,8 @@
 	position:absolute;
 	width:50%;
 	left:50%;
-	top:50%;
-	transform: translate(-50%,-50%);
+	top:auto;
+	transform: translate(-50%,-10%);
 	border-radius:3px;
 	padding:70px 100px;
 }
@@ -23,7 +23,7 @@
 	position:absolute;
 	top:0px;
 	left:0px;
-	width:40%;
+	width:50%;
 	font-size:16px;
 	color:#476DD5;
     pointer-event:none;

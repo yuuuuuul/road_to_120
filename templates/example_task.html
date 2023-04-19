@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block css %}
+<style>html {background-image: url(../../../../static/img/background.jpg);}</style>
+<link rel="stylesheet" href="../../../../static/css/background.css">
+<link rel="stylesheet" href="../../../../static/css/text.css">
+<link rel="stylesheet" href="../../../../static/css/gradient-button.css">
+<link rel="stylesheet" href="../../../../static/css/red-gradient-button.css">
+<link rel="stylesheet" href="../../../../static/css/green-gradient-button.css">
+<link rel="stylesheet" href="../../../../static/css/input.css">
+{% endblock %}
+
+{% block content %}
+<h1 align="center">Задание {{ category }}.{{ task.id }}</h1>
+<p align="center">{{ task.text_of_the_task }}</p>
+<div class="box">
+    <form method="post" id="one">
+        <p align="center">
+        <div class="input-container">
+            <input type="text" class="form-control" id="answer" name="answer" align="center">
+            <label>Введите ответ</label>
+        </div>
+        <button disabled type="submit" class="gradient-button">Отправить ответ</button>
+        </p>
+        <p>{{ message }}</p>
+    </form>
+    <a class="gradient-button" href="/">Вернуться в главное меню</a>
+</div>
+{% endblock %}

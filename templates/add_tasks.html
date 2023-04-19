@@ -6,6 +6,11 @@
 <link rel="stylesheet" href="../static/css/text.css">
 <link rel="stylesheet" href="../static/css/gradient-button.css">
 <link rel="stylesheet" href="../static/css/input.css">
+<link rel="stylesheet" href="../static/css/side_panel.css">
+{% endblock %}
+
+{% block script %}
+<script language="JavaScript" src="./static/javascript/side_panel.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -14,49 +19,40 @@
     <form action="" method="post" enctype="multipart/form-data" novalidate>
         {{ form.hidden_tag() }}
         <p>
-        <div class="input-container" align="center">{{ form.nickname(type="text", class="form-control") }}
-            <label>{{ form.nickname.label }}</label>
+        <div class="input-container" align="center">{{ form.category(type="number", class="form-control") }}
+            <label>{{ form.category.label }}</label>
         </div>
-        {% for error in form.nickname.errors %}
+        {% for error in form.category.errors %}
         <p class="alert alert-danger" role="alert">
             {{ error }}
         </p>
         {% endfor %}
         </p>
         <p>
-        <div class="input-container" align="center">{{ form.password(type="password", class="form-control") }}
-            <label>{{ form.password.label }}</label>
+        <div class="input-container" align="center">{{ form.text_of_the_task(type="text", class="form-control") }}
+            <label>{{ form.text_of_the_task.label }}</label>
         </div>
-        {% for error in form.password.errors %}
+        {% for error in form.text_of_the_task.errors %}
         <p class="alert alert-danger" role="alert">
             {{ error }}
         </p>
         {% endfor %}
         </p>
         <p>
-        <div class="input-container" align="center">{{ form.password_again(type="password", class="form-control") }}
-            <label>{{ form.password_again.label }}</label>
+        <div class="input-container" align="center">{{ form.answers(type="text", class="form-control") }}
+            <label>{{ form.answers.label }}</label>
         </div>
-        {% for error in form.password_again.errors %}
+        {% for error in form.answers.errors %}
         <p class="alert alert-danger" role="alert">
             {{ error }}
         </p>
         {% endfor %}
         </p>
         <p>
-        <div class="input-container" align="center">{{ form.email(type="email", class="form-control") }}
-            <label>{{ form.email.label }}</label>
+        <div class="input-container" align="center">{{ form.adding(type="text", class="form-control") }}
+            <label>{{ form.adding.label }}</label>
         </div>
-        {% for error in form.email.errors %}
-        <p class="alert alert-danger" role="alert">
-            {{ error }}
-        </p>
-        {% endfor %}
-        </p>
-        <p>
-            {{ form.picture.label }}<br>
-            {{ form.picture(class="form-control gradient-button") }}<br>
-            {% for error in form.picture.errors %}
+        {% for error in form.adding.errors %}
         <p class="alert alert-danger" role="alert">
             {{ error }}
         </p>

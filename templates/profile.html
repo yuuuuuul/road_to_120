@@ -13,14 +13,23 @@
 {% endblock %}
 
 {% block content %}
-<p>
-    {% if find_picture %}
-    <img src="static/img/avatars/{{ current_user.id }}.jpg" width="128" height="128">
-    {% elif not find_picture %}
-    <img src="static/img/avatars/undefined_avatar.jpg" width="128" height="128">
-    {% endif %}
-</p>
-<p>Никнейм: {{ current_user.nickname }}</p>
-<p>Решено заданий: {{ current_user.task_completed }}</p>
-<p>Почта: {{ current_user.email }}</p>
+<div align="center">
+    <p>
+        {% if find_picture %}
+        <img src="static/img/avatars/{{ current_user.id }}.jpg" width="128" height="128"
+             style="border: 4px double #476DD5; padding: 2px;">
+        {% elif not find_picture %}
+        <img src="static/img/avatars/undefined_avatar.jpg" width="128" height="128"
+             style="border: 4px double #476DD5; padding: 2px;">
+        {% endif %}
+    </p>
+    <p>Никнейм: {{ current_user.nickname }}</p>
+    <p>Решено заданий: {{ current_user.task_completed }}</p>
+    <p>Почта: {{ current_user.email }}</p>
+    <p>
+    <a class="gradient-button" href="/profile_redact">Редактировать информацию</a>
+        <a class="gradient-button" href="/password_change">Сменить пароль</a>
+    </p>
+
+</div>
 {% endblock %}

@@ -88,6 +88,7 @@ def profile_redact():
         f = form.picture.data
         if f.filename:
             f.save(os.path.join(os.getcwd(), f"static/img/avatars/{user.id}.jpg"))
+            user.picture = f"{user.id}.jpg"
         SESS.commit()
         return redirect("/profile")
     return render_template("redact.html", title="Редактирование информации",
